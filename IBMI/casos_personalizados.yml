@@ -92,13 +92,14 @@
     - name: Crear CSV con resultados con BOM, comillas y saltos reales
       copy:
         dest: "/tmp/casos.csv"
-        content: |-
-          ﻿{% if tickets_filtrados | length > 0 -%}
-          {%- for key in tickets_filtrados[0].keys() -%}
+        content: |
+          ﻿{% if tickets_filtrados | length > 0 %}
+          {% for key in tickets_filtrados[0].keys() -%}
           "{{ key }}"{% if not loop.last %},{% endif %}
-          {%- endfor %}  {# ← aquí cierro y no dejo salto extra #}
+          {%- endfor %}
+          
           {% for fila in tickets_filtrados -%}
-          {% set row = [] -%}
+          {% set row = [] %}
           {% for key, valor in fila.items() -%}
             {% if key | lower == 'status' %}
               {% set status_map = {
@@ -109,14 +110,14 @@
                 '5': 'Resuelto',
                 '6': 'Cerrado'
               } %}
-              {% set _ = row.append('"' ~ status_map.get(valor|string, valor) ~ '"') -%}
+              {% set _ = row.append('"' ~ status_map.get(valor|string, valor) ~ '"') %}
             {% else %}
-              {% set _ = row.append('"' ~ valor | replace('"', '""') ~ '"') -%}
+              {% set _ = row.append('"' ~ valor | replace('"', '""') ~ '"') %}
             {% endif %}
           {%- endfor %}
           {{ row | join(',') }}
-          {% endfor -%}
-          {% endif -%}
+          {% endfor %}
+          {% endif %}
       when: excel | lower == "si"
       delegate_to: localhost
     
