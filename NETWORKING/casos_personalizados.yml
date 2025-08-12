@@ -45,7 +45,7 @@
       LEFT JOIN glpi_groups ON glpi_groups_tickets.groups_id = glpi_groups.id
       WHERE glpi_groups.name COLLATE utf8mb4_unicode_ci = "Centro de Gestión" COLLATE utf8mb4_unicode_ci
         AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ email_tecnico }}' COLLATE utf8mb4_unicode_ci
-        AND glpi_entities.name COLLATE utf8mb4_unicode_ci = '{{ cliente }}' COLLATE utf8mb4_unicode_ci
+        AND glpi_entities.name COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', '{{ cliente }}', '%') COLLATE utf8mb4_unicode_ci
         AND glpi_tickets.status NOT IN (5, 6);
 
   tasks:
