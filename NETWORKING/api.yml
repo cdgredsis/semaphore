@@ -1,6 +1,6 @@
 ---
 - name: Conexión a la API de Fortigate con Token
-  hosts: fortigate
+  hosts: localhost
   gather_facts: no
   vars:
     fortigate_host: "192.168.36.230"        # IP o FQDN del Fortigate
