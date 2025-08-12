@@ -85,18 +85,18 @@
           {{
             (result.query_result[0] | default([]))
             | selectattr(
-                'Fecha_creacion',
+                'Fecha_creacion' | to_datetime,
                 '>=',
-                fecha_de | to_datetime
+                (fecha_de + ' 00:00:00') | to_datetime
               )
             | selectattr(
-                'Fecha_creacion',
+                'Fecha_creacion' | to_datetime,
                 '<=',
-                fecha_hasta | to_datetime
+                (fecha_hasta + ' 23:59:59') | to_datetime
               )
             | list
           }}
-
+          
     - name: Crear CSV con resultados con BOM, comillas y saltos reales
       copy:
         dest: "/tmp/casos.csv"
