@@ -1,0 +1,124 @@
+---
+- name: Consultar tickets GLPI
+  hosts: glpi
+  gather_facts: no
+  vars: 
+    consulta_todos: |
+      SELECT glpi_tickets.id,
+             glpi_tickets.status,
+             glpi_entities.name,
+             COALESCE(glpi_itilcategories.completename, 'N/A') AS Categoria,
+             glpi_tickets.name,
+             CONCAT(glpi_users.firstname, ' ', glpi_users.realname) AS Creado_Por,
+             glpi_useremails.email AS Correo_Tecnico,
+             glpi_tickets.date_mod AS Ultima_Modificación,
+             glpi_groups.name
+      FROM glpi_tickets
+      LEFT JOIN glpi_entities ON glpi_tickets.entities_id = glpi_entities.id
+      LEFT JOIN glpi_itilcategories ON glpi_tickets.itilcategories_id = glpi_itilcategories.id
+      LEFT JOIN glpi_users ON glpi_tickets.users_id_recipient = glpi_users.id
+      LEFT JOIN glpi_tickets_users ON glpi_tickets.id = glpi_tickets_users.tickets_id AND glpi_tickets_users.type = 2
+      LEFT JOIN glpi_useremails ON glpi_tickets_users.users_id = glpi_useremails.users_id
+      LEFT JOIN glpi_groups_tickets ON glpi_tickets.id = glpi_groups_tickets.tickets_id
+      LEFT JOIN glpi_groups ON glpi_groups_tickets.groups_id = glpi_groups.id
+      WHERE glpi_groups.name COLLATE utf8mb4_unicode_ci = "Centro de Gestión" COLLATE utf8mb4_unicode_ci
+        AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ email_tecnico }}' COLLATE utf8mb4_unicode_ci
+        AND glpi_tickets.status NOT IN (5, 6);
+
+    consulta_cliente: |
+      SELECT glpi_tickets.id,
+             glpi_tickets.status,
+             glpi_entities.name,
+             COALESCE(glpi_itilcategories.completename, 'N/A') AS Categoria,
+             glpi_tickets.name,
+             CONCAT(glpi_users.firstname, ' ', glpi_users.realname) AS Creado_Por,
+             glpi_useremails.email AS Correo_Tecnico,
+             glpi_tickets.date_mod AS Ultima_Modificación,
+             glpi_groups.name
+      FROM glpi_tickets
+      LEFT JOIN glpi_entities ON glpi_tickets.entities_id = glpi_entities.id
+      LEFT JOIN glpi_itilcategories ON glpi_tickets.itilcategories_id = glpi_itilcategories.id
+      LEFT JOIN glpi_users ON glpi_tickets.users_id_recipient = glpi_users.id
+      LEFT JOIN glpi_tickets_users ON glpi_tickets.id = glpi_tickets_users.tickets_id AND glpi_tickets_users.type = 2
+      LEFT JOIN glpi_useremails ON glpi_tickets_users.users_id = glpi_useremails.users_id
+      LEFT JOIN glpi_groups_tickets ON glpi_tickets.id = glpi_groups_tickets.tickets_id
+      LEFT JOIN glpi_groups ON glpi_groups_tickets.groups_id = glpi_groups.id
+      WHERE glpi_groups.name COLLATE utf8mb4_unicode_ci = "Centro de Gestión" COLLATE utf8mb4_unicode_ci
+        AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ email_tecnico }}' COLLATE utf8mb4_unicode_ci
+        AND glpi_entities.name COLLATE utf8mb4_unicode_ci = '{{ cliente }}' COLLATE utf8mb4_unicode_ci
+        AND glpi_tickets.status NOT IN (5, 6);
+
+  tasks:
+    - name: Seleccionar consulta según cliente
+      set_fact:
+        consulta_sql: "{{ consulta_todos if cliente == 'ALL' else consulta_cliente }}"
+
+    - name: Consulta base de datos GLPI
+      community.mysql.mysql_query:
+        login_db: "{{ login_db }}"
+        login_user: "{{ login_user }}"
+        login_password: "{{ login_password }}"
+        query: "{{ consulta_sql }}"
+      register: result
+
+    - name: Crear CSV con resultados con BOM, comillas y saltos reales
+      copy:
+        dest: "/tmp/casos.csv"
+        content: |
+          ﻿{% for key in result.query_result[0][0].keys() -%}
+          "{{ key }}"{% if not loop.last %},{% endif %}
+          {%- endfor %}
+          
+          {% for fila in result.query_result[0] -%}
+          {% set row = [] %}
+          {% for valor in fila.values() -%}
+          {% set _ = row.append('"' ~ valor | replace('"', '""') ~ '"') %}
+          {%- endfor %}
+          {{ row | join(',') }}
+          {% endfor %}
+      when: excel | lower == "si"
+      delegate_to: localhost
+      
+    - name: Enviar correo con casos del ingeniero
+      community.general.mail:
+        host: "{{ email_host }}"
+        port: "{{ email_port }}"
+        username: "{{ email_username }}"
+        password: "{{ email_password }}"
+        timeout: 60
+        secure: starttls
+        subject: "CASOS - {{ email_tecnico }}"
+        to: "{{ email_to }}"
+        cc: "{{ email_cc }}"
+        from: "{{ email_from }}"
+        subtype: "html"
+        attach: "{{ ['/tmp/casos.csv'] if excel | lower == 'si' else omit }}"
+        body: |
+          <html>
+              <head>
+                <style>
+                  table { border-collapse: collapse; width: 100%; }
+                  th { background-color: yellow; padding: 8px; border: 1px solid black; }
+                  td { padding: 8px; border: 1px solid black; }
+                </style>
+              </head>
+              <body>
+                <h2>Casos para: {{ email_tecnico }}</h2>
+                <table>
+                  <tr>
+                    {% for key in result.query_result[0][0].keys() %}
+                      <th>{{ key | upper }}</th>
+                    {% endfor %}
+                  </tr>
+                  {% for caso in result.query_result[0] %}
+                  <tr>
+                    {% for valor in caso.values() %}
+                      <td>{{ valor }}</td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </table>
+                <br>
+              </body>
+          </html>
+      delegate_to: localhost
