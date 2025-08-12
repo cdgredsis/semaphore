@@ -117,7 +117,7 @@
         secure: starttls
         subject: "CASOS - {{ casos_de }}"
         to: "{{ enviar_a }}"
-        cc: "{{ copiar_a if copiar_a | length > 0 else omit }}"
+        cc: "{{ copiar_a | default('') if copiar_a | default('') | length > 0 else omit }}"
         from: "{{ email_from }}"
         subtype: "html"
         attach: "{{ ['/tmp/casos.csv'] if excel | lower == 'si' else omit }}"
