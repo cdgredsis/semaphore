@@ -1,1 +1,7 @@
-
+---
+- hosts: localhost
+  gather_facts: yes 
+  tasks:
+    - name: msg
+      debug:
+        var: ansible
