@@ -53,7 +53,7 @@
         var: casos_de
     - name: Seleccionar consulta según cliente
       set_fact:
-        consulta_sql: "{{ consulta_todos if cliente == 'ALL' else consulta_cliente }}"
+        consulta_sql: "{{ consulta_todos if cliente | lower == 'todos' else consulta_cliente }}"
 
     - name: Consulta base de datos GLPI
       community.mysql.mysql_query:
