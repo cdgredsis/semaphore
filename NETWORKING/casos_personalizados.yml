@@ -49,6 +49,8 @@
         AND glpi_tickets.status NOT IN (5, 6);
 
   tasks:
+    - debug: 
+        var: consulta
     - name: Seleccionar consulta según cliente
       set_fact:
         consulta_sql: "{{ consulta_todos if cliente == 'ALL' else consulta_cliente }}"
