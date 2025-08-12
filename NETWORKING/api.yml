@@ -1,0 +1,22 @@
+---
+- name: Conexión a la API de Fortigate con Token
+  hosts: fortigate
+  gather_facts: no
+  vars:
+    fortigate_host: "192.168.36.230"        # IP o FQDN del Fortigate
+    fortigate_token: "kNy8107n00fcgsyz3Nx8gk9pjckp1y"   # Token API generado en Fortigate
+
+  tasks:
+    - name: Obtener información de firewall policies
+      uri:
+        url: "https://{{ fortigate_host }}/api/v2/cmdb/firewall/address"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ fortigate_token }}"
+        validate_certs: no
+        return_content: yes
+      register: result
+
+    - name: Mostrar resultado
+      debug:
+        var: result.json
