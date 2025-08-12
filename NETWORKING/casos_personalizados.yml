@@ -100,8 +100,20 @@
           
           {% for fila in tickets_filtrados -%}
           {% set row = [] %}
-          {% for valor in fila.values() -%}
-          {% set _ = row.append('"' ~ valor | replace('"', '""') ~ '"') %}
+          {% for key, valor in fila.items() -%}
+            {% if key | lower == 'status' %}
+              {% set status_map = {
+                '1': 'Nuevo',
+                '2': 'En curso (asignada)',
+                '3': 'En curso (planificada)',
+                '4': 'En Espera',
+                '5': 'Resuelto',
+                '6': 'Cerrado'
+              } %}
+              {% set _ = row.append('"' ~ status_map.get(valor|string, valor) ~ '"') %}
+            {% else %}
+              {% set _ = row.append('"' ~ valor | replace('"', '""') ~ '"') %}
+            {% endif %}
           {%- endfor %}
           {{ row | join(',') }}
           {% endfor %}
@@ -142,8 +154,20 @@
                   </tr>
                   {% for caso in tickets_filtrados %}
                   <tr>
-                    {% for valor in caso.values() %}
-                      <td>{{ valor }}</td>
+                    {% for key, valor in caso.items() %}
+                      {% if key | lower == 'status' %}
+                        {% set status_map = {
+                          '1': 'Nuevo',
+                          '2': 'En curso (asignada)',
+                          '3': 'En curso (planificada)',
+                          '4': 'En Espera',
+                          '5': 'Resuelto',
+                          '6': 'Cerrado'
+                        } %}
+                        <td>{{ status_map.get(valor|string, valor) }}</td>
+                      {% else %}
+                        <td>{{ valor }}</td>
+                      {% endif %}
                     {% endfor %}
                   </tr>
                   {% endfor %}
@@ -152,4 +176,5 @@
               </body>
           </html>
       delegate_to: localhost
+
 
