@@ -87,7 +87,7 @@
         password: "{{ email_password }}"
         timeout: 60
         secure: starttls
-        subject: "CASOS - {{ email_tecnico }}"
+        subject: "CASOS - {{ casos_de }}"
         to: "{{ enviar_a }}"
         cc: "{{ copiar_a }}"
         from: "{{ email_from }}"
