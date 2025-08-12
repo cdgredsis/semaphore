@@ -22,7 +22,7 @@
       LEFT JOIN glpi_groups_tickets ON glpi_tickets.id = glpi_groups_tickets.tickets_id
       LEFT JOIN glpi_groups ON glpi_groups_tickets.groups_id = glpi_groups.id
       WHERE glpi_groups.name COLLATE utf8mb4_unicode_ci = "Centro de Gestión" COLLATE utf8mb4_unicode_ci
-        AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ email_tecnico }}' COLLATE utf8mb4_unicode_ci
+        AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ casos_de }}' COLLATE utf8mb4_unicode_ci
         AND glpi_tickets.status NOT IN (5, 6);
 
     consulta_cliente: |
@@ -44,7 +44,7 @@
       LEFT JOIN glpi_groups_tickets ON glpi_tickets.id = glpi_groups_tickets.tickets_id
       LEFT JOIN glpi_groups ON glpi_groups_tickets.groups_id = glpi_groups.id
       WHERE glpi_groups.name COLLATE utf8mb4_unicode_ci = "Centro de Gestión" COLLATE utf8mb4_unicode_ci
-        AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ email_tecnico }}' COLLATE utf8mb4_unicode_ci
+        AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ casos_de }}' COLLATE utf8mb4_unicode_ci
         AND glpi_entities.name COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', '{{ cliente }}', '%') COLLATE utf8mb4_unicode_ci
         AND glpi_tickets.status NOT IN (5, 6);
 
@@ -88,8 +88,8 @@
         timeout: 60
         secure: starttls
         subject: "CASOS - {{ email_tecnico }}"
-        to: "{{ email_to }}"
-        cc: "{{ email_cc }}"
+        to: "{{ enviar_a }}"
+        cc: "{{ copiar_a }}"
         from: "{{ email_from }}"
         subtype: "html"
         attach: "{{ ['/tmp/casos.csv'] if excel | lower == 'si' else omit }}"
