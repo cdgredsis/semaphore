@@ -34,7 +34,6 @@
       WHERE glpi_groups.name COLLATE utf8mb4_unicode_ci = "Centro de Gestión" COLLATE utf8mb4_unicode_ci
         AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ casos_de }}' COLLATE utf8mb4_unicode_ci;
 
-  
     consulta_cliente: |
       SELECT 
           glpi_tickets.id,
@@ -67,8 +66,6 @@
         AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ casos_de }}' COLLATE utf8mb4_unicode_ci
         AND glpi_entities.name COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', '{{ cliente }}', '%') COLLATE utf8mb4_unicode_ci;
 
-
-
   tasks:
     - name: Seleccionar consulta según cliente
       set_fact:
@@ -82,21 +79,31 @@
         query: "{{ consulta_sql }}"
       register: result
 
+    - name: Filtrar resultados por rango de fechas
+      set_fact:
+        tickets_filtrados: >-
+          {{ result.query_result[0]
+             | selectattr('Fecha_creacion', '>=', fecha_de)
+             | selectattr('Fecha_creacion', '<=', fecha_hasta)
+             | list }}
+
     - name: Crear CSV con resultados con BOM, comillas y saltos reales
       copy:
         dest: "/tmp/casos.csv"
         content: |
-          ﻿{% for key in result.query_result[0][0].keys() -%}
+          ﻿{% if tickets_filtrados | length > 0 %}
+          {% for key in tickets_filtrados[0].keys() -%}
           "{{ key }}"{% if not loop.last %},{% endif %}
           {%- endfor %}
           
-          {% for fila in result.query_result[0] -%}
+          {% for fila in tickets_filtrados -%}
           {% set row = [] %}
           {% for valor in fila.values() -%}
           {% set _ = row.append('"' ~ valor | replace('"', '""') ~ '"') %}
           {%- endfor %}
           {{ row | join(',') }}
           {% endfor %}
+          {% endif %}
       when: excel | lower == "si"
       delegate_to: localhost
       
@@ -127,11 +134,11 @@
                 <h2>Casos para: {{ casos_de }}</h2>
                 <table>
                   <tr>
-                    {% for key in result.query_result[0][0].keys() %}
+                    {% for key in tickets_filtrados[0].keys() %}
                       <th>{{ key | upper }}</th>
                     {% endfor %}
                   </tr>
-                  {% for caso in result.query_result[0] %}
+                  {% for caso in tickets_filtrados %}
                   <tr>
                     {% for valor in caso.values() %}
                       <td>{{ valor }}</td>
@@ -143,3 +150,5 @@
               </body>
           </html>
       delegate_to: localhost
+
+
