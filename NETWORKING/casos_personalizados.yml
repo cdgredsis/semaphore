@@ -50,7 +50,7 @@
 
   tasks:
     - debug: 
-        var: consulta
+        var: casos_de
     - name: Seleccionar consulta según cliente
       set_fact:
         consulta_sql: "{{ consulta_todos if cliente == 'ALL' else consulta_cliente }}"
