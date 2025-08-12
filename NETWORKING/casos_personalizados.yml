@@ -79,24 +79,16 @@
         query: "{{ consulta_sql }}"
       register: result
 
-    - name: Filtrar resultados por rango de fechas reales
+    - name: Filtrar resultados por rango de fechas (simple)
       set_fact:
         tickets_filtrados: >-
           {{
             (result.query_result[0] | default([]))
-            | selectattr('Fecha_creacion', 'defined')
-            | selectattr(
-                'Fecha_creacion' | to_datetime('%Y-%m-%d %H:%M:%S'),
-                '>=',
-                (fecha_de + ' 00:00:00') | to_datetime('%Y-%m-%d %H:%M:%S')
-              )
-            | selectattr(
-                'Fecha_creacion' | to_datetime('%Y-%m-%d %H:%M:%S'),
-                '<=',
-                (fecha_hasta + ' 23:59:59') | to_datetime('%Y-%m-%d %H:%M:%S')
-              )
+            | selectattr('Fecha_creacion', '>=', fecha_de ~ 'T00:00:00')
+            | selectattr('Fecha_creacion', '<=', fecha_hasta ~ 'T23:59:59')
             | list
           }}
+
 
     - name: Crear CSV con resultados con BOM, comillas y saltos reales
       copy:
