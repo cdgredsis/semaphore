@@ -82,10 +82,13 @@
     - name: Filtrar resultados por rango de fechas
       set_fact:
         tickets_filtrados: >-
-          {{ result.query_result[0]
-             | selectattr('Fecha_creacion', '>=', fecha_de)
-             | selectattr('Fecha_creacion', '<=', fecha_hasta)
-             | list }}
+          {{
+            (result.query_result[0] | default([]))
+            | selectattr('Fecha_creacion', '>=', fecha_de)
+            | selectattr('Fecha_creacion', '<=', fecha_hasta)
+            | list
+          }}
+
 
     - name: Crear CSV con resultados con BOM, comillas y saltos reales
       copy:
