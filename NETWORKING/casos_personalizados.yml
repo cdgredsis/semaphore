@@ -103,7 +103,7 @@
                 </style>
               </head>
               <body>
-                <h2>Casos para: {{ email_tecnico }}</h2>
+                <h2>Casos para: {{ casos_de }}</h2>
                 <table>
                   <tr>
                     {% for key in result.query_result[0][0].keys() %}
