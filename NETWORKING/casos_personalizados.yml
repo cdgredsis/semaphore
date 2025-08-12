@@ -117,7 +117,7 @@
         secure: starttls
         subject: "CASOS - {{ casos_de }}"
         to: "{{ enviar_a }}"
-        cc: "{{ copiar_a }}"
+        cc: "{{ copiar_a if copiar_a | length > 0 else omit }}"
         from: "{{ email_from }}"
         subtype: "html"
         attach: "{{ ['/tmp/casos.csv'] if excel | lower == 'si' else omit }}"
@@ -134,11 +134,11 @@
                 <h2>Casos para: {{ casos_de }}</h2>
                 <table>
                   <tr>
-                    {% for key in tickets_filtrados[0].keys() %}
+                    {% for key in result.query_result[0][0].keys() %}
                       <th>{{ key | upper }}</th>
                     {% endfor %}
                   </tr>
-                  {% for caso in tickets_filtrados %}
+                  {% for caso in result.query_result[0] %}
                   <tr>
                     {% for valor in caso.values() %}
                       <td>{{ valor }}</td>
@@ -150,5 +150,4 @@
               </body>
           </html>
       delegate_to: localhost
-
 
