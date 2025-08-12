@@ -96,7 +96,7 @@
           ﻿{% if tickets_filtrados | length > 0 -%}
           {%- for key in tickets_filtrados[0].keys() -%}
           "{{ key }}"{% if not loop.last %},{% endif %}
-          {%- endfor %}
+          {%- endfor %}  {# ← aquí cierro y no dejo salto extra #}
           {% for fila in tickets_filtrados -%}
           {% set row = [] -%}
           {% for key, valor in fila.items() -%}
