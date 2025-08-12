@@ -94,27 +94,25 @@
         dest: "/tmp/casos.csv"
         content: |
           ﻿{% if tickets_filtrados | length > 0 %}
-          {% for key in tickets_filtrados[0].keys() -%}
+          {% for key in tickets_filtrados[0].keys() %}
           "{{ key }}"{% if not loop.last %},{% endif %}
-          {%- endfor %}
-          
-          {% for fila in tickets_filtrados -%}
+          {% endfor %}
+    
+          {% for fila in tickets_filtrados %}
           {% set row = [] %}
-          {% for key, valor in fila.items() -%}
-            {% if key | lower == 'status' %}
-              {% set status_map = {
-                '1': 'Nuevo',
-                '2': 'En curso (asignada)',
-                '3': 'En curso (planificada)',
-                '4': 'En Espera',
-                '5': 'Resuelto',
-                '6': 'Cerrado'
-              } %}
-              {% set _ = row.append('"' ~ status_map.get(valor|string, valor) ~ '"') %}
-            {% else %}
-              {% set _ = row.append('"' ~ valor | replace('"', '""') ~ '"') %}
-            {% endif %}
-          {%- endfor %}
+          {% for k, valor in fila.items() %}
+          {% if k == 'status' %}
+          {% set valor = {
+            '1': 'Nuevo',
+            '2': 'En curso (asignada)',
+            '3': 'En curso (planificada)',
+            '4': 'En Espera',
+            '5': 'Resuelto',
+            '6': 'Cerrado'
+          }[valor|string] | default(valor) %}
+          {% endif %}
+          {% set _ = row.append('"' ~ (valor | replace('"', '""')) ~ '"') %}
+          {% endfor %}
           {{ row | join(',') }}
           {% endfor %}
           {% endif %}
