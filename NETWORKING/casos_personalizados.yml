@@ -108,7 +108,7 @@
           {% endif %}
       when: excel | lower == "si"
       delegate_to: localhost
-      
+    
     - name: Enviar correo con casos del ingeniero
       community.general.mail:
         host: "{{ email_host }}"
@@ -136,11 +136,11 @@
                 <h2>Casos para: {{ casos_de }}</h2>
                 <table>
                   <tr>
-                    {% for key in result.query_result[0][0].keys() %}
+                    {% for key in tickets_filtrados[0].keys() %}
                       <th>{{ key | upper }}</th>
                     {% endfor %}
                   </tr>
-                  {% for caso in result.query_result[0] %}
+                  {% for caso in tickets_filtrados %}
                   <tr>
                     {% for valor in caso.values() %}
                       <td>{{ valor }}</td>
