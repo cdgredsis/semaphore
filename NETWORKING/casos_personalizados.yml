@@ -13,7 +13,8 @@
           CONCAT(glpi_users.firstname, ' ', glpi_users.realname) AS Creado_Por,
           glpi_useremails.email AS Correo_Tecnico,
           glpi_tickets.date_mod AS Ultima_Modificación,
-          glpi_groups.name
+          glpi_groups.name,
+          glpi_tickets.date_creation AS Fecha_creacion
       FROM glpi_tickets
       LEFT JOIN glpi_entities 
           ON glpi_tickets.entities_id = glpi_entities.id
@@ -31,8 +32,8 @@
       LEFT JOIN glpi_groups 
           ON glpi_groups_tickets.groups_id = glpi_groups.id
       WHERE glpi_groups.name COLLATE utf8mb4_unicode_ci = "Centro de Gestión" COLLATE utf8mb4_unicode_ci
-        AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ casos_de }}' COLLATE utf8mb4_unicode_ci
-        AND glpi_tickets.status NOT IN (5, 6);
+        AND glpi_useremails.email COLLATE utf8mb4_unicode_ci = '{{ casos_de }}' COLLATE utf8mb4_unicode_ci;
+
   
     consulta_cliente: |
       SELECT 
