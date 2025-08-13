@@ -32,6 +32,11 @@
         login_host: localhost
         login_password: "Passw0rd!!*"
         query: "SELECT version();"
+      register: prueba
       delegate_to: localhost
+
+     - name: debug
+       debug: 
+         var: prueba
 
 
