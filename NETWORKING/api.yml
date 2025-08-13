@@ -7,16 +7,14 @@
     fortigate_token: "kNy8107n00fcgsyz3Nx8gk9pjckp1y"   # Token API generado en Fortigate
 
   tasks:
-    - name: Test Fortigate API
+    - name: Obtener direcciones firewall
       uri:
-        url: "https://192.168.36.230/api/v2/cmdb/firewall/address"
+        url: "{{ fortigate_url }}"
         method: GET
         headers:
-          Authorization: "Token {{ fortigate_token }}"
+          Authorization: "Bearer {{ fortigate_token }}"
         validate_certs: no
-        return_content: yes
-      register: result
+      register: resultado
 
-    - name: Mostrar resultado
-      debug:
-        var: result.json
+    - debug:
+        var: resultado.json
