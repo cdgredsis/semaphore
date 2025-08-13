@@ -13,14 +13,10 @@
       debug:
         var: output.stdout_lines
 
-    - name: Insertar datos en PostgreSQL
-      community.postgresql.postgresql_query:
-        db: ibm_data
-        login_user: semaphore_user
-        login_host: localhost
-        login_password: "Passw0rd!!*"
-        query: |
-          {% for item in output.stdout_lines | select('search', ',') | list %}
+    - name: Generar query SQL
+      set_fact:
+        insert_query: |
+          {% for item in output.stdout_lines %}
           INSERT INTO historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
           VALUES (
             '{{ item.split(",")[0] }}',
@@ -29,5 +25,13 @@
           );
           {% endfor %}
       delegate_to: localhost
-      run_once: true
+    - name: Insertar datos en PostgreSQL
+      community.postgresql.postgresql_query:
+        db: ibm_data
+        login_user: semaphore_user
+        login_host: localhost
+        login_password: "Passw0rd!!*"
+        query: "{{ insert_query }}"
+      delegate_to: localhost
+
 
