@@ -6,7 +6,7 @@
   tasks:
     - name: Obtener información de firewall policies
       uri:
-        url: "http://{{ fortigate_host }}/api/v2/cmdb"
+        url: "http://{{ fortigate_host }}/api/v2/cmdb/system/interface"
         method: GET
         headers:
           Authorization: "Bearer {{ fortigate_token }}"
