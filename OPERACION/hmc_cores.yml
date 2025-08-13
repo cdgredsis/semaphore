@@ -29,7 +29,6 @@
       community.postgresql.postgresql_query:
         login_db: ibm_data
         login_user: postgres
-        login_host: localhost
         login_password: "Passw0rd!!*"
         query: "select * from historico_cpu_lpar"
       delegate_to: localhost
