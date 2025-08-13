@@ -3,7 +3,7 @@
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Obtener direcciones firewall
+    - name: Creación de VLAN
       uri:
         url: "{{ fortigate_url }}"
         method: POST
