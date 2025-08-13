@@ -21,7 +21,6 @@
           role: "{{ role }}"
           device-identification: "{{ device_identification }}"
           snmp-index: "{{ vlan_id }}"
-          allowaccess: "{{ allow_access }}"
           alias: "{{ alias_name }}"
           vlan-protocol: "{{ vlan_protocol }}"
           status: "up"
