@@ -17,7 +17,7 @@
       set_fact:
         insert_query: |
           {% for item in output.stdout_lines %}
-          INSERT INTO historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
+          INSERT INTO ibm_data.historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
           VALUES (
             '{{ item.split(",")[0] }}',
             NOW(),
