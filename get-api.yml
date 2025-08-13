@@ -1,0 +1,18 @@
+---
+- name: Conexión a la API de Fortigate con Token
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Obtener información de firewall policies
+      uri:
+        url: "https://{{ fortigate_host }}/api/v2/cmdb/system/interface"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ fortigate_token }}"
+        validate_certs: no
+      register: result
+
+    - name: Mostrar resultado
+      debug:
+        var: result.json
