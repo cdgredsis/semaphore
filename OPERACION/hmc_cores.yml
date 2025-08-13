@@ -13,27 +13,24 @@
       debug:
         var: output.stdout_lines
 
-    - name: Generar query SQL
+    - name: Generar query SQL dinámico para todos los LPARs
       set_fact:
-        insert_query: |
+        insert_query: >
           {% for item in output.stdout_lines %}
-          INSERT INTO historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
-          VALUES (
-            '{{ item.split(",")[0] }}',
-            NOW(),
-            {{ item.split(",")[1] }}
-          );
+          INSERT INTO public.historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
+          VALUES ('{{ item.split(",")[0] }}', NOW(), {{ item.split(",")[1] }});
           {% endfor %}
       delegate_to: localhost
+    
     - name: Insertar datos en PostgreSQL
       community.postgresql.postgresql_query:
         login_db: ibm_data
         login_user: postgres
         login_host: localhost
         login_password: "Passw0rd!!*"
-        query: "SELECT version();"
-      register: prueba
+        query: "{{ insert_query }}"
       delegate_to: localhost
+
 
     - name: debug
       debug: 
