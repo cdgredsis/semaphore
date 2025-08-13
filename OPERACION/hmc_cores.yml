@@ -20,7 +20,7 @@
         login_host: localhost
         login_password: "Passw0rd!!*"
         query: |
-          {% for item in output.stdout_lines %}
+          {% for item in output.stdout_lines | select('search', ',') | list %}
           INSERT INTO historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
           VALUES (
             '{{ item.split(",")[0] }}',
@@ -29,3 +29,5 @@
           );
           {% endfor %}
       delegate_to: localhost
+      run_once: true
+
