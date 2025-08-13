@@ -1,0 +1,31 @@
+---
+- name: Obtener datos de procesador y memoria asignado en LPAR IBM i en la HMC y guardar resultado
+  hosts: HMC
+  gather_facts: yes
+  tasks:
+    - name: Ejecutar comando sobre los servidores
+      ansible.builtin.raw: |
+        lssyscfg -r prof -m 9105-22A*7887EF1 -F lpar_name,desired_proc_units,desired_mem;
+        lssyscfg -r prof -m 9105-41B*7887F01 -F lpar_name,desired_proc_units,desired_mem
+      register: output
+
+    - name: Mostrar resultados
+      debug:
+        var: output.stdout_lines
+
+    - name: Insertar datos en PostgreSQL
+      community.postgresql.postgresql_query:
+        db: ibm_data
+        login_user: semaphore_user
+        login_host: localhost
+        login_password: "Passw0rd!!*"
+        query: |
+          {% for item in output.stdout_lines %}
+          INSERT INTO historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
+          VALUES (
+            '{{ item.split(",")[0] }}',
+            NOW(),
+            {{ item.split(",")[1] }}
+          );
+          {% endfor %}
+      delegate_to: localhost
