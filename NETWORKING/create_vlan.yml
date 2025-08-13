@@ -26,7 +26,7 @@
           vlan-protocol: "{{ vlan_protocol }}"
           status: "up"
           vlan_ip: "0.0.0.0/0.0.0.0"
-          snmp_index: "{{ snmp_index }}"
+          snmp_index: "{{ vlan_id }}"
       register: resultado
 
     - debug:
