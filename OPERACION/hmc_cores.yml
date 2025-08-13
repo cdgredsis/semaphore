@@ -26,13 +26,9 @@
       community.postgresql.postgresql_query:
         login_user: postgres
         login_host: localhost
-        login_password: "Passw0rd!!*"
+        login_password: "{{login_password}}"
         query: "{{ insert_query }}"
       delegate_to: localhost
 
-
-    - name: debug
-      debug: 
-        var: prueba
 
 
