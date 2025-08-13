@@ -35,8 +35,8 @@
       register: prueba
       delegate_to: localhost
 
-     - name: debug
-       debug: 
-         var: prueba
+    - name: debug
+      debug: 
+        var: prueba
 
 
