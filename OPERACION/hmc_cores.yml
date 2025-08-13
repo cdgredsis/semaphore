@@ -17,7 +17,7 @@
       set_fact:
         insert_query: |
           {% for item in output.stdout_lines %}
-          INSERT INTO ibm_data.historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
+          INSERT INTO public.historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
           VALUES (
             '{{ item.split(",")[0] }}',
             NOW(),
@@ -31,7 +31,7 @@
         login_user: postgres
         login_host: localhost
         login_password: "Passw0rd!!*"
-        query: "\dt historico_cpu_lpar"
+        query: "{{insert_query}}"
       delegate_to: localhost
 
 
