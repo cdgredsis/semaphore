@@ -14,4 +14,4 @@
       register: resultado
 
     - debug:
-        var: resultado.json.results[0].dstaddr
+        var: resultado.json
