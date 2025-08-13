@@ -24,7 +24,6 @@
     
     - name: Insertar datos en PostgreSQL
       community.postgresql.postgresql_query:
-        login_db: ibm_data
         login_user: postgres
         login_host: localhost
         login_password: "Passw0rd!!*"
