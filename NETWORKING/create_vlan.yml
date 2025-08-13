@@ -1,0 +1,28 @@
+---
+- name: Conexión a la API de Fortigate con Token
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Obtener direcciones firewall
+      uri:
+        url: "{{ fortigate_url }}"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ fortigate_token }}"
+          Content-Type: "application/json"
+        validate_certs: no
+        body_format: json
+        body:
+          name: "{{ vlan_name }}"
+          vdom: "{{ vdom }}"
+          type: vlan
+          interface: "{{ physical_interface }}"
+          vlanid: "{{ vlan_id }}"
+          ip: "{{ vlan_ip }}"
+          allowaccess: "{{ allow_access }}"
+          status: "up"
+      register: resultado
+
+    - debug:
+        var: resultado.json
