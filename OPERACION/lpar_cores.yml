@@ -17,8 +17,8 @@
       set_fact:
         insert_query: >
           {% for item in output.stdout_lines %}
-          INSERT INTO public.historico_cpu_lpar (nombre_lpar, fecha, core_asignado)
-          VALUES ('{{ item.split(",")[0] }}', NOW(), {{ item.split(",")[1] }});
+          INSERT INTO public.historico_cpu_lpar (nombre_lpar, fecha, core_asignado, ram_asignada)
+          VALUES ('{{ item.split(",")[0] }}', NOW(), {{ item.split(",")[1] }}, {{ item.split(",")[2] }} );
           {% endfor %}
       delegate_to: localhost
     
